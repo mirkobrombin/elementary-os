@@ -19,9 +19,15 @@ jobs:
       options: --privileged
 
     steps:
-    - name: Clone build scripts
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-    - name: Build and upload daily .iso
-      run: |
-        ./workflows.sh etc/terraform-daily-7.0-azure.conf "${{ secrets.key }}" "${{ secrets.secret }}" "${{ secrets.endpoint }}" "${{ secrets.bucket }}"
+    - name: Install needed packages
+      run: apt update && apt install debootstrap -y
+
+    - name: Build ISO
+      run: ./build.sh etc/terraform.conf
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: daily-7.0
+        path: builds/
